@@ -1,0 +1,236 @@
+
+#include <iostream>
+using namespace std;
+
+template <class T> class Chain;
+
+
+template <class T>
+class ChainNode {
+    friend class Chain<T>;
+
+private:
+    T data;
+    ChainNode<T>* link;
+
+public:
+    ChainNode() {
+        link = 0;
+    }
+
+    ChainNode(const T& data) {
+        this->data = data;
+        this->link = 0;
+    }
+
+    ChainNode(const T& data, ChainNode<T>* link) {
+        this->data = data;
+        this->link = link;
+    }
+};
+
+
+template <class T>
+class Chain {
+public:
+
+    Chain() {
+        first = 0;
+    }
+
+    ~Chain() {
+        while (first != 0) {
+            ChainNode<T>* next = first->link;
+            delete first;
+            first = next;
+        }
+    }
+
+    void Insert(int n, const T& value) {
+        if (n < 0)
+            throw "error1";
+
+        if (n == 0) {
+            first = new ChainNode<T>(value, first);
+        }
+        else {
+            ChainNode<T>* point = first;
+
+            for (int i = 0; i < n - 1; i++) {
+                if (point == 0)
+                    throw "error2";
+
+                point = point->link;
+            }
+
+            if (point == 0)
+                throw "error2";
+
+            point->link = new ChainNode<T>(value, point->link);
+        }
+    }
+
+    void Delete(int theIndex) {
+        if (first == 0) {
+            cout << "空\n";
+            return;
+        }
+
+        if (theIndex < 0)
+            throw "不存在負項";
+
+        ChainNode<T>* deleteNode;
+
+        if (theIndex == 0) {
+            deleteNode = first;
+            first = first->link;
+        }
+        else {
+            ChainNode<T>* point = first;
+
+            for (int i = 0; i < theIndex - 1; i++) {
+                if (point == 0)
+                    throw "指定刪除項目不存在";
+
+                point = point->link;
+            }
+
+            if (point == 0 || point->link == 0)
+                throw "指定刪除項目不存在";
+
+            deleteNode = point->link;
+            point->link = deleteNode->link;
+        }
+
+        delete deleteNode;
+    }
+
+    int IndexOf(const T& value) const {
+        ChainNode<T>* currentNode = first;
+        int index = 0;
+
+        while (currentNode != 0 && currentNode->data != value) {
+            currentNode = currentNode->link;
+            index++;
+        }
+
+        if (currentNode == 0)
+            return -1;
+        else
+            return index;
+    }
+
+    void Display() {
+        ChainNode<T>* a = first;
+
+        while (a != 0) {
+            cout << a->data << " ";
+            a = a->link;
+        }
+
+        cout << endl;
+    }
+
+    void top() {
+        if (first == 0) {
+            cout << "Stack 為空\n";
+            return;
+        }
+
+        cout << first->data << endl;
+    }
+
+    int IsEmpty() {
+        if (first == 0)
+            return 1;
+        else
+            return 0;
+    }
+
+    T Rear() {
+        ChainNode<T>* a = first;
+
+        if (a == 0)
+            throw "Stack 為空";
+
+        while (a != 0) {
+            if (a->link == 0)
+                return a->data;
+
+            a = a->link;
+        }
+
+        throw "Stack 為空";
+    }
+
+private:
+    ChainNode<T>* first;
+};
+
+
+int main() {
+    Chain<int> ch;
+    int pos1 = 0;
+
+    while (true) {
+
+        cout << "\n1.Push\n2.Pop\n3.Top\n4.IsEmpty\n5.Display\n0.Exit\n";
+
+        int func;
+        cin >> func;
+
+        if (func == 1) {
+
+            cout << "輸入數值\n";
+
+            int val;
+            cin >> val;
+
+            ch.Insert(pos1, val);
+            pos1++;
+        }
+
+        else if (func == 2) {
+
+            if (ch.IsEmpty() == 1) {
+                cout << "Stack 為空，無法 Pop\n";
+            }
+            else {
+                ch.Delete(pos1 - 1);
+                pos1--;
+
+                cout << "Pop 成功\n";
+            }
+        }
+
+        else if (func == 3) {
+
+            cout << ch.Rear() << endl;
+        }
+
+        else if (func == 4) {
+
+            if (ch.IsEmpty() == 1)
+                cout << "空link chain\n";
+            else
+                cout << "非空link chain\n";
+        }
+
+        else if (func == 5) {
+
+          
+            ch.Display();
+        }
+
+        else if (func == 0) {
+
+            return 0;
+        }
+
+        else {
+            cout << "輸入錯誤，請重新輸入\n";
+        }
+    }
+
+    return 0;
+}
